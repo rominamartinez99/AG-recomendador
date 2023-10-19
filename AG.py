@@ -1,7 +1,8 @@
 import csv
 import random
 
-archivo = 'titles13.csv'
+archivo = 'titles14.csv'
+archivo_actores = 'credits1.csv'
 
 def info_completa_csv(filename):
     datos = []
@@ -13,6 +14,28 @@ def info_completa_csv(filename):
                 grupo = [campo.strip() for campo in fila]
                 datos.append(grupo)
     return datos
+
+def obtener_actores_por_pelicula(archivo_actores):
+	datos_agrupados = {}
+	with open(archivo_actores, 'r', newline='', encoding='utf-8') as archivo_csv:
+		lector_csv = csv.reader(archivo_csv)
+		next(lector_csv)  # Omitir la línea de encabezados
+
+		# Recorre las filas del CSV
+		for fila in lector_csv:
+			titulo = fila[1]
+			actores = fila[2]
+
+			# Si la columna A no está en el diccionario, crea una nueva entrada
+			if titulo not in datos_agrupados:
+				datos_agrupados[titulo] = []
+
+			# Agrega el valor de la columna B a la lista correspondiente en el diccionario
+			datos_agrupados[titulo].append(actores)
+
+	# Convierte el diccionario a una lista de listas
+	resultado = [[clave, valores] for clave, valores in datos_agrupados.items()]
+	return resultado
 
 def generar_poblacion_inicial_con_CSV(filename):
     datos = []
@@ -54,30 +77,44 @@ def nueva_poblacion_por_cruzamiento(poblacion_elegida):
     return descendencia
 
 info_completa = info_completa_csv(archivo)
+lista_actores = obtener_actores_por_pelicula(archivo_actores)
 
 def calcular_aptitud(id_titulo, info_completa):
     valor_aptitud = 0
     for elemento in info_completa:
         if (elemento[0] == id_titulo):
-            if (elemento[2] == tipo):
-                valor_aptitud += 10
+            if (elemento[2] == tipo): #Show o movie
+                valor_aptitud += 20
             else:
                 valor_aptitud -= 10
+            if (int(elemento[3]) >= anio): #anio de estreno
+                valor_aptitud += 5
+            else:
+                valor_aptitud -= 5
             if (genero in elemento[5]):
                 valor_aptitud += 15
             else:
                 valor_aptitud -= 15
             if(elemento[7]):
                 if (float(elemento[7]) >= puntuacion):
-                    valor_aptitud += 5
+                    valor_aptitud += 3
                 else:
-                    valor_aptitud -= 5
+                    valor_aptitud -= 3
+
             if(elemento[8]):
                 elemento[8] = elemento[8].replace(",", ".")
                 if (float(elemento[8]) >= puntuacion):
-                    valor_aptitud += 5
+                    valor_aptitud += 3
                 else:
-                    valor_aptitud -= 5
+                    valor_aptitud -= 3
+
+    if (actor!="-"):
+        for elemento in lista_actores:
+            if (elemento[0] == id_titulo):
+                if (actor in elemento[1]):
+                    valor_aptitud += 15
+                else:
+                    valor_aptitud -= 10
     return valor_aptitud
 
 
@@ -125,7 +162,7 @@ def get_user_data():
     # Opciones predefinidas en inglés
     genres = ['documentation', 'war', 'drama', 'crime', 'history', 'animation', 'sport', 'horror', 'fantasy', 'european', 'reality', 'romance', 'western', 'comedy', 'music', 'family', 'thriller', 'scifi', 'action']
     ratings = ["0-3", "4-7", "8-10"]
-    content_types = ["SHOW", "MOVIE"]
+    content_types = ["MOVIE", "SHOW"]
 
     # Traducción de géneros y tipos al español
     generos_en_espanol = ['Documental', 'Guerra', 'Drama', 'Crimen', 'Historia', 'Animacion', 'Deporte', 'Terror', 'Fanatasia', 'Europeas', 'Realidad', 'Romance', 'Western', 'Comedia', 'Musical', 'Familia', 'Thriller', 'Ciencia Ficcion', 'Accion']
@@ -192,49 +229,52 @@ def get_user_data():
 
     chosen_content_type = content_types[content_type_id - 1]
 
+    actor = input("Ingresa el nombre y/o apellido de un actor o actriz deseado. Si no tenes preferencia, ingresá un guión '-':")
     # Devolver las opciones elegidas en un diccionario
     user_data = {
         "genre": chosen_genre,
         "rating": chosen_rating,
         "content_type": chosen_content_type,
-        "year": chosen_year
+        "year": chosen_year,
+        "actor": actor
     }
 
     return user_data
 
-datos_usuario = get_user_data()
-print("\nDatos ingresados correctamente, estamos buscando lo mejor para vos!.")
-
 # Ejecución del Algoritmo Genético
 
 #Input del usuario
+datos_usuario = get_user_data()
+print("\nDatos ingresados correctamente. ¡Estamos buscando lo mejor para vos!")
 
 tipo = datos_usuario["content_type"]
 genero = datos_usuario["genre"]
-puntuacion = datos_usuario["rating"]
+puntuacion = float(datos_usuario["rating"])
 anio = datos_usuario["year"]
+actor = datos_usuario["actor"]
 
 #tipo = 'MOVIE'
 #genero = 'romance'
 #puntuacion = 6.0
 prob_mut = 0.5
-vueltas = 10
+vueltas = 100
 
-
+#Generar poblacion inicial
 poblacion = generar_poblacion_inicial_con_CSV(archivo)
 
+#Ciclos - criterio de paro
 for i in range(vueltas):
+    #Operador seleccion
     nueva_poblacion = seleccion_por_ranking(poblacion)
+    #Operador cruzamiento
     descendencia = nueva_poblacion_por_cruzamiento(nueva_poblacion)
     poblacion = descendencia
+    #Operador mutacion
     r = random.uniform(0,1)
     if r <= prob_mut:
         poblacion = mutar_poblacion(poblacion)
 
+#Mejor individuo
 print("\nTe recomendamos:")
 imprimir_recomendacion(poblacion)
 
-
-print(calcular_aptitud('ts300399',info_completa)) #tiene ceros
-print(calcular_aptitud('tm82169',info_completa)) #tiene comas
-print(calcular_aptitud('tm191099',info_completa)) #tiene puntos
