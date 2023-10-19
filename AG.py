@@ -115,23 +115,89 @@ def imprimir_recomendacion(poblacion):
 			if (elemento[0] == poblacion_final[0][i]):
 				print(i+1,')',elemento[1],'\n')
 				
-	
+def get_user_data():
+    # Opciones predefinidas en inglés
+    genres = ['documentation', 'war', 'drama', 'crime', 'history', 'animation', 'sport', 'horror', 'fantasy', 'european', 'reality', 'romance', 'western', 'comedy', 'music', 'family', 'thriller', 'scifi', 'action']
+    ratings = ["0-3", "4-7", "8-10"]
+    content_types = ["SHOW", "MOVIE"]
+
+    # Traducción de géneros y tipos al español
+    generos_en_espanol = ['Documental', 'Guerra', 'Drama', 'Crimen', 'Historia', 'Animacion', 'Deporte', 'Terror', 'Fanatasia', 'Europeas', 'Realidad', 'Romance', 'Western', 'Comedia', 'Musical', 'Familia', 'Thriller', 'Ciencia Ficcion', 'Accion']
+    tipo_en_espanol = ["Pelicula", "Serie"]
+
+    # Preguntar al usuario en español sobre el género
+    print("Opciones de género:")
+    for i, genero in enumerate(generos_en_espanol, 1):
+        print(f"{i}. {genero}")
+    
+    while True:
+        try:
+            genre_id = int(input("Elige el ID del género que deseas: "))
+            if 1 <= genre_id <= len(generos_en_espanol):
+                break
+            else:
+                print("ID incorrecto. Introduce un ID válido.")
+        except ValueError:
+            print("Entrada no válida. Introduce un número entero válido.")
+
+    chosen_genre = genres[genre_id - 1]
+
+    # Preguntar al usuario en español sobre la calificación
+    
+    while True:
+        try:
+            rating_id = int(input("Elige el número de calificación minima que prefieres del 1 al 10: "))
+            if 1 <= rating_id <= 10:
+                break
+            else:
+                print("Número incorrecto. Introduce un número del 1 al 10.")
+        except ValueError:
+            print("Entrada no válida. Introduce un número entero válido.")
+
+    chosen_rating = rating_id
+
+    # Preguntar al usuario en español sobre el tipo de contenido
+    print("\nOpciones de tipo de contenido:")
+    for i, content_type in enumerate(tipo_en_espanol, 1):
+        print(f"{i}. {content_type}")
+
+    while True:
+        try:
+            content_type_id = int(input("Elige el ID del tipo de contenido: "))
+            if 1 <= content_type_id <= len(tipo_en_espanol):
+                break
+            else:
+                print("ID incorrecto. Introduce un ID válido.")
+        except ValueError:
+            print("Entrada no válida. Introduce un número entero válido.")
+
+    chosen_content_type = content_types[content_type_id - 1]
+
+    # Devolver las opciones elegidas en un diccionario
+    user_data = {
+        "genre": chosen_genre,
+        "rating": chosen_rating,
+        "content_type": chosen_content_type
+    }
+
+    return user_data
+
+datos_usuario = get_user_data()
+print("\nDatos ingresados correctamente, estamos buscando lo mejor para vos!.")
 
 # Ejecución del Algoritmo Genético
 
 #Input del usuario
 
-#unique_genres = poblacion[5].unique()
-#if(genero in unique_genres): 
-#	print("Género válido")
-#else:
-#print("No existe género")
+tipo = datos_usuario["content_type"]
+genero = datos_usuario["genre"]
+puntuacion = datos_usuario["rating"]
 
-tipo = 'MOVIE'
-genero = 'romance'
-puntuacion = 6.0
+#tipo = 'MOVIE'
+#genero = 'romance'
+#puntuacion = 6.0
 prob_mut = 0.5
-vueltas = 200
+vueltas = 10
 
 
 poblacion = generar_poblacion_inicial_con_CSV(archivo)
@@ -143,5 +209,7 @@ for i in range(vueltas):
     r = random.uniform(0,1)
     if r <= prob_mut:
         poblacion = mutar_poblacion(poblacion)
+
+print("\nTe recomendamos:")
 imprimir_recomendacion(poblacion)
 
