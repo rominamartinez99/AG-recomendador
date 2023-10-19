@@ -72,6 +72,12 @@ def calcular_aptitud(id_titulo, info_completa):
                     valor_aptitud += 5
                 else:
                     valor_aptitud -= 5
+            if(elemento[8]):
+                elemento[8] = elemento[8].replace(",", ".")
+                if (float(elemento[8]) >= puntuacion):
+                    valor_aptitud += 5
+                else:
+                    valor_aptitud -= 5
     return valor_aptitud
 
 
@@ -124,8 +130,9 @@ def get_user_data():
     # Traducción de géneros y tipos al español
     generos_en_espanol = ['Documental', 'Guerra', 'Drama', 'Crimen', 'Historia', 'Animacion', 'Deporte', 'Terror', 'Fanatasia', 'Europeas', 'Realidad', 'Romance', 'Western', 'Comedia', 'Musical', 'Familia', 'Thriller', 'Ciencia Ficcion', 'Accion']
     tipo_en_espanol = ["Pelicula", "Serie"]
-
+    print("¡Bienvenido al recomendador de contenido del grupo 3 de IA!")
     # Preguntar al usuario en español sobre el género
+    print("A continuación deberás elegir algunos datos para que podamos buscar el mejor contenido en base a tus preferencias.")
     print("Opciones de género:")
     for i, genero in enumerate(generos_en_espanol, 1):
         print(f"{i}. {genero}")
@@ -146,7 +153,7 @@ def get_user_data():
     
     while True:
         try:
-            rating_id = int(input("Elige el número de calificación minima que prefieres del 1 al 10: "))
+            rating_id = int(input("Elige el número de calificación mínima que prefieres del 1 al 10: "))
             if 1 <= rating_id <= 10:
                 break
             else:
@@ -155,6 +162,18 @@ def get_user_data():
             print("Entrada no válida. Introduce un número entero válido.")
 
     chosen_rating = rating_id
+
+    while True:
+        try:
+            min_year = int(input("Elige el año de estreno a partir del cual te interesa el contenido: "))
+            if min_year >= 0:
+                break
+            else:
+                print("Número incorrecto. Introduce un número mayor a cero.")
+        except ValueError:
+            print("Entrada no válida. Introduce un número entero mayor a cero.")
+
+    chosen_year = min_year
 
     # Preguntar al usuario en español sobre el tipo de contenido
     print("\nOpciones de tipo de contenido:")
@@ -177,7 +196,8 @@ def get_user_data():
     user_data = {
         "genre": chosen_genre,
         "rating": chosen_rating,
-        "content_type": chosen_content_type
+        "content_type": chosen_content_type,
+        "year": chosen_year
     }
 
     return user_data
@@ -192,6 +212,7 @@ print("\nDatos ingresados correctamente, estamos buscando lo mejor para vos!.")
 tipo = datos_usuario["content_type"]
 genero = datos_usuario["genre"]
 puntuacion = datos_usuario["rating"]
+anio = datos_usuario["year"]
 
 #tipo = 'MOVIE'
 #genero = 'romance'
@@ -213,3 +234,7 @@ for i in range(vueltas):
 print("\nTe recomendamos:")
 imprimir_recomendacion(poblacion)
 
+
+print(calcular_aptitud('ts300399',info_completa)) #tiene ceros
+print(calcular_aptitud('tm82169',info_completa)) #tiene comas
+print(calcular_aptitud('tm191099',info_completa)) #tiene puntos
