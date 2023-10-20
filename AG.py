@@ -214,12 +214,12 @@ def get_user_data():
     while True:
         try:
             min_year = int(input("Elige el año de estreno a partir del cual te interesa el contenido: "))
-            if min_year >= 0:
+            if 1900 <= min_year <= 2023:
                 break
             else:
-                print("Número incorrecto. Introduce un número mayor a cero.")
+                print("Entrada no válida. Ingrese un año válido (ejemplo: 1995).")
         except ValueError:
-            print("Entrada no válida. Introduce un número entero mayor a cero.")
+            print("Entrada no válida. Ingrese un año válido (ejemplo: 1995).")
 
     chosen_year = min_year
 
@@ -240,10 +240,19 @@ def get_user_data():
 
     chosen_content_type = content_types[content_type_id - 1]
 
-    if (chosen_content_type == "SHOW"): #Preguntar máximo de temporadas
-        duracion = int(input("Elige la cantidad máxima de temporadas deseada: "))
-    else: #Preguntar duracion máxima
-        duracion = int(input("Elige la cantidad máxima de minutos de duración deseada:"))
+    while True:
+        try:
+            if chosen_content_type == "SHOW":
+                duracion = int(input("Elige la cantidad máxima de temporadas deseada: "))
+            else:
+                duracion = int(input("Elige la cantidad máxima de minutos de duración deseada: "))
+
+            if duracion > 0:
+                break  # Si es un número válido, sal del bucle
+            else:
+                print("Por favor, ingrese un número entero mayor a cero. Intente nuevamente.")
+        except ValueError:
+            print("Entrada no válida. Ingrese un número entero mayor a cero.")
 
     actor = input("Ingresa el nombre y/o apellido de un actor o actriz deseado. Si no tenes preferencia, ingresá un guión '-':")
     # Devolver las opciones elegidas en un diccionario
