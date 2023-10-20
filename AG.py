@@ -82,40 +82,51 @@ lista_actores = obtener_actores_por_pelicula(archivo_actores)
 def calcular_aptitud(id_titulo, info_completa):
     valor_aptitud = 0
     for elemento in info_completa:
-        if (elemento[0] == id_titulo):
-            if (elemento[2] == tipo): #Show o movie
+        if elemento[0] == id_titulo:
+            if elemento[2] == tipo:  # Show o movie
                 valor_aptitud += 20
+                if tipo == "SHOW":
+                    if float(elemento[6]) <= duracion:
+                        valor_aptitud += 15
+                    else:
+                        valor_aptitud -= 10
+                else:
+                    if float(elemento[4]) <= duracion:
+                        valor_aptitud += 15
+                    else:
+                        valor_aptitud -= 10
             else:
                 valor_aptitud -= 10
-            if (int(elemento[3]) >= anio): #anio de estreno
+
+            if int(elemento[3]) >= anio:  # Año de estreno
                 valor_aptitud += 5
             else:
                 valor_aptitud -= 5
-            if (genero in elemento[5]):
+            if genero in elemento[5]:
                 valor_aptitud += 15
             else:
                 valor_aptitud -= 15
-            if(elemento[7]):
-                if (float(elemento[7]) >= puntuacion):
+            if elemento[7]:
+                if float(elemento[7]) >= puntuacion:
                     valor_aptitud += 3
                 else:
                     valor_aptitud -= 3
-
-            if(elemento[8]):
+            if elemento[8]:
                 elemento[8] = elemento[8].replace(",", ".")
-                if (float(elemento[8]) >= puntuacion):
+                if float(elemento[8]) >= puntuacion:
                     valor_aptitud += 3
                 else:
                     valor_aptitud -= 3
 
-    if (actor!="-"):
+    if actor != "-":
         for elemento in lista_actores:
-            if (elemento[0] == id_titulo):
-                if (actor in elemento[1]):
+            if elemento[0] == id_titulo:
+                if actor in elemento[1]:
                     valor_aptitud += 15
                 else:
                     valor_aptitud -= 10
     return valor_aptitud
+
 
 
 def calcular_aptitud_general(recomendacion, info_completa):
@@ -185,7 +196,7 @@ def get_user_data():
             print("Entrada no válida. Introduce un número entero válido.")
 
     chosen_genre = genres[genre_id - 1]
-
+		
     # Preguntar al usuario en español sobre la calificación
     
     while True:
@@ -229,6 +240,11 @@ def get_user_data():
 
     chosen_content_type = content_types[content_type_id - 1]
 
+    if (chosen_content_type == "SHOW"): #Preguntar máximo de temporadas
+        duracion = int(input("Elige la cantidad máxima de temporadas deseada: "))
+    else: #Preguntar duracion máxima
+        duracion = int(input("Elige la cantidad máxima de minutos de duración deseada:"))
+
     actor = input("Ingresa el nombre y/o apellido de un actor o actriz deseado. Si no tenes preferencia, ingresá un guión '-':")
     # Devolver las opciones elegidas en un diccionario
     user_data = {
@@ -236,7 +252,8 @@ def get_user_data():
         "rating": chosen_rating,
         "content_type": chosen_content_type,
         "year": chosen_year,
-        "actor": actor
+        "actor": actor,
+        "duracion": duracion
     }
 
     return user_data
@@ -252,6 +269,7 @@ genero = datos_usuario["genre"]
 puntuacion = float(datos_usuario["rating"])
 anio = datos_usuario["year"]
 actor = datos_usuario["actor"]
+duracion = datos_usuario["duracion"]
 
 #tipo = 'MOVIE'
 #genero = 'romance'
@@ -277,4 +295,3 @@ for i in range(vueltas):
 #Mejor individuo
 print("\nTe recomendamos:")
 imprimir_recomendacion(poblacion)
-
