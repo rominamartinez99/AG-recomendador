@@ -1,11 +1,11 @@
 # AG-recomendador
 Grupo:
-González Pérez, Ailén
-González Posleman, Constanza
-Grillo, Matías
-Martínez Priore, Romina
-Puyol, Matias Francisco
-Raposo, Nahuel
+González Pérez, Ailén.  
+González Posleman, Constanza.  
+Grillo, Matías.  
+Martínez Priore, Romina.  
+Puyol, Matias Francisco.  
+Raposo, Nahuel.  
 
 Para ejecutar:
 1) Ingresar a la consola (cmd)
