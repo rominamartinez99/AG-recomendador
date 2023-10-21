@@ -1,8 +1,12 @@
 import csv
 import random
+import os
 
 archivo = 'titles14.csv'
 archivo_actores = 'credits1.csv'
+#para logs
+nombre_csv_vueltas = "corrida9_vueltas.csv"
+nombre_csv_recomendaciones = "recomendaciones9-10.csv"
 
 def info_completa_csv(filename):
     datos = []
@@ -127,8 +131,6 @@ def calcular_aptitud(id_titulo, info_completa):
                     valor_aptitud -= 10
     return valor_aptitud
 
-
-
 def calcular_aptitud_general(recomendacion, info_completa):
     valor_aptitud = 0
     for i in range(5):
@@ -161,13 +163,16 @@ def mutar_poblacion(poblacion):
     aux[cromosoma_a_cambiar][posicion_a_cambiar] = nueva_peli
     return aux
 
-
 def imprimir_recomendacion(poblacion):
 	poblacion_final = sorted(poblacion, key=lambda x: x[5], reverse=True)
 	for i in range(5):
 		for elemento in info_completa:
 			if (elemento[0] == poblacion_final[0][i]):
 				print(i+1,')',elemento[1],'\n')
+	datos_a_escribir = [[nombre_csv_vueltas,prob_mut,vueltas,tipo,genero,puntuacion,anio,actor,duracion,poblacion_final[0][5],poblacion_final[0][1],poblacion_final[0][2],poblacion_final[0][3],poblacion_final[0][4],poblacion_final[0][5]]]
+	escribir_a_csv(nombre_csv_recomendaciones, datos_a_escribir)
+	datos_a_escribir1 = [[vueltas, poblacion_final[0][5]]]
+	escribir_a_csv(nombre_csv_vueltas, datos_a_escribir1)
 				
 def get_user_data():
     # Opciones predefinidas en inglés
@@ -267,6 +272,16 @@ def get_user_data():
 
     return user_data
 
+def escribir_a_csv(nombre_archivo, datos):
+    # Verificar si el archivo ya existe
+    archivo_existe = os.path.exists(nombre_archivo)
+    # Abre el archivo CSV en modo escritura (creará el archivo si no existe)
+    with open(nombre_archivo, 'a', newline='', encoding='utf-8') as archivo_csv:
+        escritor_csv = csv.writer(archivo_csv)
+        # Escribe los datos en el archivo CSV
+        for fila in datos:
+            escritor_csv.writerow(fila)
+
 # Ejecución del Algoritmo Genético
 
 #Input del usuario
@@ -283,8 +298,8 @@ duracion = datos_usuario["duracion"]
 #tipo = 'MOVIE'
 #genero = 'romance'
 #puntuacion = 6.0
-prob_mut = 0.5
-vueltas = 100
+prob_mut = 0.1
+vueltas = 800
 
 #Generar poblacion inicial
 poblacion = generar_poblacion_inicial_con_CSV(archivo)
@@ -296,6 +311,10 @@ for i in range(vueltas):
     #Operador cruzamiento
     descendencia = nueva_poblacion_por_cruzamiento(nueva_poblacion)
     poblacion = descendencia
+    descendencia_aux = sorted(descendencia, key=lambda x: x[5], reverse=True)
+    datos_a_escribir = [[i, descendencia_aux[0][5]]]
+    escribir_a_csv(nombre_csv_vueltas, datos_a_escribir)
+
     #Operador mutacion
     r = random.uniform(0,1)
     if r <= prob_mut:
